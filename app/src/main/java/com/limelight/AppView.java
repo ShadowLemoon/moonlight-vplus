@@ -390,6 +390,13 @@ public class AppView extends Activity implements AdapterFragmentCallbacks {
         setTitle(computerName);
         label.setText(computerName);
 
+        // Setup settings button
+        ImageButton settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(AppView.this, com.limelight.preferences.StreamSettings.class);
+            startActivity(intent);
+        });
+
         // Bind to the computer manager service
         bindService(new Intent(this, ComputerManagerService.class), serviceConnection,
                 Service.BIND_AUTO_CREATE);
