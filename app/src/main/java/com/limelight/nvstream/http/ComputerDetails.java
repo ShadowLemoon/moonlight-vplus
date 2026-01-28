@@ -69,6 +69,7 @@ public class ComputerDetails {
     public AddressTuple ipv6Address;
     public String macAddress;
     public X509Certificate serverCert;
+    public boolean ipv6Disabled;
 
     // Transient attributes
     public State state;
@@ -133,7 +134,8 @@ public class ComputerDetails {
         if (details.manualAddress != null) {
             this.manualAddress = details.manualAddress;
         }
-        if (details.ipv6Address != null) {
+        // 如果已禁用 IPv6，则不更新 ipv6Address（保持为 null）
+        if (details.ipv6Address != null && !this.ipv6Disabled) {
             this.ipv6Address = details.ipv6Address;
         }
         if (details.macAddress != null && !ZERO_MAC.equals(details.macAddress)) {
@@ -279,8 +281,8 @@ public class ComputerDetails {
             return selectFromLanAddresses(lanAddresses);
         }
         
-        // 其次选择IPv6地址
-        if (ipv6Address != null && availableAddresses.contains(ipv6Address)) {
+        // 其次选择IPv6地址（如果未禁用）
+        if (!ipv6Disabled && ipv6Address != null && availableAddresses.contains(ipv6Address)) {
             return ipv6Address;
         }
         
@@ -296,7 +298,7 @@ public class ComputerDetails {
         if (localAddress != null && isLanIpv4Address(localAddress)) {
             return localAddress;
         }
-        if (ipv6Address != null) {
+        if (!ipv6Disabled && ipv6Address != null) {
             return ipv6Address;
         }
         if (remoteAddress != null) {
@@ -336,7 +338,7 @@ public class ComputerDetails {
         str.append("UUID: ").append(uuid).append("\n");
         str.append("Local Address: ").append(localAddress).append("\n");
         str.append("Remote Address: ").append(remoteAddress).append("\n");
-        str.append("IPv6 Address: ").append(ipv6Address).append("\n");
+        str.append("IPv6 Address: ").append(ipv6Disabled ? "Disabled" : ipv6Address).append("\n");
         str.append("Manual Address: ").append(manualAddress).append("\n");
         str.append("MAC Address: ").append(macAddress).append("\n");
         str.append("Pair State: ").append(pairState).append("\n");

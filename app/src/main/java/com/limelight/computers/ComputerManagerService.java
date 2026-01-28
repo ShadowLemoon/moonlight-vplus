@@ -266,6 +266,10 @@ public class ComputerManagerService extends Service {
             ComputerManagerService.this.removeComputer(computer);
         }
 
+        public void updateComputer(ComputerDetails computer) {
+            ComputerManagerService.this.updateComputer(computer);
+        }
+
         public void stopPolling() {
             // Just call the unbind handler to cleanup
             ComputerManagerService.this.onUnbind(null);
@@ -526,6 +530,27 @@ public class ComputerManagerService extends Service {
         releaseLocalDatabaseReference();
     }
 
+    public void updateComputer(ComputerDetails computer) {
+        if (!getLocalDatabaseReference()) {
+            return;
+        }
+
+        // Update the computer in the database
+        dbManager.updateComputer(computer);
+
+        // Also update the in-memory copy
+        synchronized (pollingTuples) {
+            for (PollingTuple tuple : pollingTuples) {
+                if (tuple.computer.uuid.equals(computer.uuid)) {
+                    tuple.computer.update(computer);
+                    break;
+                }
+            }
+        }
+
+        releaseLocalDatabaseReference();
+    }
+
     private boolean getLocalDatabaseReference() {
         if (dbRefCount.get() == 0) {
             return false;
@@ -608,7 +633,7 @@ public class ComputerManagerService extends Service {
             new ParallelPollTuple(details.localAddress, details),
             new ParallelPollTuple(details.manualAddress, details),
             new ParallelPollTuple(details.remoteAddress, details),
-            new ParallelPollTuple(details.ipv6Address, details)
+            new ParallelPollTuple(details.ipv6Disabled ? null : details.ipv6Address, details)
         };
 
         // 使用共享锁来通知任何一个地址响应
