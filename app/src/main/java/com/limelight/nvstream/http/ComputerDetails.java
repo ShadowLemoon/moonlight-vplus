@@ -281,8 +281,8 @@ public class ComputerDetails {
             return selectFromLanAddresses(lanAddresses);
         }
         
-        // 其次选择IPv6地址（如果未禁用）
-        if (!ipv6Disabled && ipv6Address != null && availableAddresses.contains(ipv6Address)) {
+        // 其次选择IPv6地址
+        if (ipv6Address != null && availableAddresses.contains(ipv6Address)) {
             return ipv6Address;
         }
         
@@ -298,7 +298,7 @@ public class ComputerDetails {
         if (localAddress != null && isLanIpv4Address(localAddress)) {
             return localAddress;
         }
-        if (!ipv6Disabled && ipv6Address != null) {
+        if (ipv6Address != null) {
             return ipv6Address;
         }
         if (remoteAddress != null) {

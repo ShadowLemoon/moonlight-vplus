@@ -633,7 +633,7 @@ public class ComputerManagerService extends Service {
             new ParallelPollTuple(details.localAddress, details),
             new ParallelPollTuple(details.manualAddress, details),
             new ParallelPollTuple(details.remoteAddress, details),
-            new ParallelPollTuple(details.ipv6Disabled ? null : details.ipv6Address, details)
+            new ParallelPollTuple(details.ipv6Address, details)
         };
 
         // 使用共享锁来通知任何一个地址响应
