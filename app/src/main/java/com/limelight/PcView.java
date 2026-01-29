@@ -1601,9 +1601,19 @@ public class PcView extends Activity implements AdapterFragmentCallbacks, ShakeD
         // 切换IPv6禁用状态
         details.ipv6Disabled = !details.ipv6Disabled;
 
-        // 如果禁用了IPv6，清空ipv6Address
+        // 如果禁用了IPv6，清空所有IPv6相关地址
         if (details.ipv6Disabled) {
             details.ipv6Address = null;
+
+            // 如果activeAddress是IPv6，清空它
+            if (ComputerDetails.isIpv6Address(details.activeAddress)) {
+                details.activeAddress = null;
+            }
+
+            // 从availableAddresses中移除所有IPv6地址
+            if (details.availableAddresses != null) {
+                details.availableAddresses.removeIf(ComputerDetails::isIpv6Address);
+            }
         }
 
         // 更新数据库

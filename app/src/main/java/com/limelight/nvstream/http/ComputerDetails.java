@@ -163,7 +163,12 @@ public class ComputerDetails {
 
     public void addAvailableAddress(AddressTuple address) {
         if (address == null) return;
-        
+
+        // 如果禁用了IPv6，不添加IPv6地址
+        if (ipv6Disabled && isIpv6Address(address)) {
+            return;
+        }
+
         if (availableAddresses == null) {
             availableAddresses = new ArrayList<>();
         }
@@ -281,8 +286,8 @@ public class ComputerDetails {
             return selectFromLanAddresses(lanAddresses);
         }
         
-        // 其次选择IPv6地址
-        if (ipv6Address != null && availableAddresses.contains(ipv6Address)) {
+        // 其次选择IPv6地址（如果未禁用）
+        if (!ipv6Disabled && ipv6Address != null && availableAddresses.contains(ipv6Address)) {
             return ipv6Address;
         }
         
@@ -290,7 +295,16 @@ public class ComputerDetails {
         if (remoteAddress != null && availableAddresses.contains(remoteAddress)) {
             return remoteAddress;
         }
-        
+
+        // 从剩余地址中选择第一个非IPv6地址（如果IPv6被禁用）
+        if (ipv6Disabled) {
+            for (AddressTuple address : availableAddresses) {
+                if (!isIpv6Address(address)) {
+                    return address;
+                }
+            }
+        }
+
         return availableAddresses.get(0);
     }
 
@@ -298,7 +312,7 @@ public class ComputerDetails {
         if (localAddress != null && isLanIpv4Address(localAddress)) {
             return localAddress;
         }
-        if (ipv6Address != null) {
+        if (!ipv6Disabled && ipv6Address != null) {
             return ipv6Address;
         }
         if (remoteAddress != null) {
